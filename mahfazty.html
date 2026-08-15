@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محفظتي المستقبلية | Wallet Flow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #131b2e;
+            --card-bg: rgba(23, 32, 54, 0.7);
+            --text-main: #f0f4f8;
+            --text-sub: #8a99ad;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-green: #00e676;
+            --accent-red: #ff5252;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f4f7fe;
+            --bg-secondary: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #1b2559;
+            --text-sub: #707ebe;
+            --accent-cyan: #0083b0;
+            --accent-blue: #00b4db;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px 10px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+        }
+
+        /* Auth Screen Styles */
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 30px 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-main);
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .input-field:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            box-shadow: none;
+            margin-top: 8px;
+        }
+
+        /* Header & Navigation Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-welcome h3 {
+            font-size: 1.1rem;
+        }
+
+        .user-welcome p {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--text-sub);
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: white;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 1.2rem;
+        }
+
+        /* Dashboard Wallet Cards */
+        .wallets-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .wallet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .wallet-cash::before {
+            background: var(--accent-green);
+        }
+
+        .wallet-card-bank::before {
+            background: var(--accent-blue);
+        }
+
+        .wallet-title {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .wallet-amount {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--text-main);
+        }
+
+        .add-deposit-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--accent-cyan);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* History & Filter Section */
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 80px;
+        }
+
+        .filter-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .date-input {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-main);
+            font-size: 0.8rem;
+        }
+
+        .summary-banner {
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px dashed var(--accent-cyan);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .txn-list,
+        .wish-list {
+            list-style: none;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .txn-item,
+        .wish-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .txn-info h4,
+        .wish-info h4 {
+            font-size: 0.95rem;
+        }
+
+        .txn-info p,
+        .wish-info p {
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+        }
+
+        .txn-amount {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .txn-expense {
+            color: var(--accent-red);
+        }
+
+        .txn-income {
+            color: var(--accent-green);
+        }
+
+        .txn-transfer {
+            color: var(--accent-blue);
+        }
+
+        /* Wishlist Green Animation */
+        .wish-item.bought {
+            background: rgba(0, 230, 118, 0.25) !important;
+            border: 1px solid var(--accent-green) !important;
+            box-shadow: 0 0 20px var(--accent-green);
+        }
+
+        .wish-item.bought::after {
+            content: '✔ تم الشراء';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--accent-green);
+            color: #000;
+            font-weight: 900;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .wish-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-icon-btn {
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-check {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--accent-green);
+        }
+
+        .btn-delete {
+            background: rgba(255, 82, 82, 0.15);
+            color: var(--accent-red);
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: white;
+            font-size: 2rem;
+            border: none;
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- Auth View -->
+        <div id="auth-view" class="auth-card">
+            <h2 class="auth-title">محفظتي 💳</h2>
+            <p style="color: var(--text-sub); margin-bottom: 20px; font-size: 0.9rem;">أدِر مصاريفك ونوتة مشترياتك بذكاء
+            </p>
+
+            <div id="auth-step-phone">
+                <div class="form-group">
+                    <label>رقم الموبايل</label>
+                    <input type="tel" id="phone-input" class="input-field" placeholder="01xxxxxxxxx">
+                </div>
+                <button class="btn" onclick="handlePhoneSubmit()">متابعة 🚀</button>
+            </div>
+
+            <div id="auth-step-login" class="hidden">
+                <div class="form-group">
+                    <label>كلمة السر</label>
+                    <input type="password" id="login-pass" class="input-field" placeholder="••••••••">
+                </div>
+                <button class="btn" onclick="handleLogin()">دخول 🔑</button>
+            </div>
+
+            <div id="auth-step-register" class="hidden">
+                <div class="form-group">
+                    <label>رمز التأكيد OTP (تلقائي للعرض):</label>
+                    <input type="text" id="otp-display" class="input-field" readonly
+                        style="text-align: center; font-weight: bold; color: var(--accent-cyan);">
+                </div>
+                <div class="form-group">
+                    <label>أدخل رمز OTP</label>
+                    <input type="text" id="otp-input" class="input-field" placeholder="1234">
+                </div>
+                <div class="form-group">
+                    <label>كلمة سر جديدة</label>
+                    <input type="password" id="reg-pass" class="input-field" placeholder="••••••••">
+                </div>
+                <button class="btn" onclick="handleRegister()">تأكيد وإنشاء الحساب ✨</button>
+            </div>
+        </div>
+
+        <!-- Main Dashboard View -->
+        <div id="dashboard-view" class="hidden">
+            <div class="top-bar">
+                <div class="user-welcome">
+                    <h3 id="user-phone-display">أهلاً بك 👋</h3>
+                    <p>مرحباً بك في محفظتك الرقمية</p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                    <button class="theme-toggle" onclick="logout()" style="color: var(--accent-red);">🚪</button>
+                </div>
+            </div>
+
+            <!-- Nav Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" id="tab-home" onclick="switchTab('home')">🏠 المحفظة الرئيسية</button>
+                <button class="nav-tab" id="tab-wishlist" onclick="switchTab('wishlist')">📝 نوتة الشراء</button>
+            </div>
+
+            <!-- Home Tab Content -->
+            <div id="view-home">
+                <div class="wallets-wrapper">
+                    <div class="wallet-card wallet-cash">
+                        <div class="wallet-title">💵 المحفظة</div>
+                        <div class="wallet-amount" id="cash-balance">0 ج.م</div>
+                        <button class="add-deposit-btn" onclick="openModal('deposit', 'cash')">+ إيداع / قبض</button>
+                    </div>
+                    <div class="wallet-card wallet-card-bank">
+                        <div class="wallet-title">💳 الكارت البنكي</div>
+                        <div class="wallet-amount" id="bank-balance">0 ج.م</div>
+                        <button class="add-deposit-btn" onclick="openModal('deposit', 'bank')">+ إيداع / قبض</button>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h4 style="margin-bottom: 12px; font-size: 0.95rem;">📊 سجل المعاملات</h4>
+
+                    <div class="filter-box">
+                        <div>
+                            <label style="font-size: 0.75rem; color: var(--text-sub);">من:</label>
+                            <input type="date" id="filter-from" class="date-input" onchange="renderTransactions()">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; color: var(--text-sub);">إلى:</label>
+                            <input type="date" id="filter-to" class="date-input" onchange="renderTransactions()">
+                        </div>
+                    </div>
+
+                    <div class="summary-banner">
+                        إجمالي المصاريف في الفترة: <strong id="total-filtered-expenses"
+                            style="color: var(--accent-red);">0 ج.م</strong>
+                    </div>
+
+                    <ul class="txn-list" id="txn-list"></ul>
+                </div>
+                <button class="fab" onclick="openModal('expense')">+</button>
+            </div>
+
+            <!-- Wishlist Tab Content -->
+            <div id="view-wishlist" class="hidden">
+                <div class="section-card">
+                    <h4 style="margin-bottom: 8px; font-size: 0.95rem;">📌 أشياء حابب تشتريها</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 15px;">سجل الحجات عشان متنسهاش
+                        وشوف إجمالي فلوسهم</p>
+
+                    <div class="summary-banner" style="border-color: var(--accent-blue);">
+                        إجمالي الحاجات المطلوبة: <strong id="wishlist-total" style="color: var(--accent-cyan);">0
+                            ج.م</strong>
+                    </div>
+
+                    <ul class="wish-list" id="wish-list"></ul>
+                </div>
+                <button class="fab" onclick="openWishlistModal()">+</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modal Form Transactions -->
+    <div id="action-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title" style="margin-bottom: 15px;">إضافة معاملة</h3>
+
+            <div class="form-group" id="group-type">
+                <label>نوع العملية</label>
+                <select id="txn-type" class="input-field" onchange="adjustModalFields()">
+                    <option value="expense">مصروف (خصم)</option>
+                    <option value="transfer">تحويل بين الخزائن</option>
+                    <option value="deposit">إيداع / رصيد جديد</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>المبلغ (ج.م)</label>
+                <input type="number" id="txn-amount" class="input-field" placeholder="0">
+            </div>
+
+            <div class="form-group" id="group-target">
+                <label id="target-label">من خزنة</label>
+                <select id="txn-source" class="input-field">
+                    <option value="cash">💵 المحفظة</option>
+                    <option value="bank">💳 الكارت البنكي</option>
+                </select>
+            </div>
+
+            <div class="form-group hidden" id="group-destination">
+                <label>إلى خزنة</label>
+                <select id="txn-dest" class="input-field">
+                    <option value="bank">💳 الكارت البنكي</option>
+                    <option value="cash">💵 المحفظة</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>السبب / البيان</label>
+                <input type="text" id="txn-note" class="input-field" placeholder="مثال: أكل، مواصلات، راتب...">
+            </div>
+
+            <button class="btn" onclick="submitTransaction()">حفظ المعاملة 💾</button>
+            <button class="btn btn-secondary" onclick="closeModal('action-modal')">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- Modal Form Wishlist -->
+    <div id="wishlist-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px;">📝 إضافة شيء للنوتة</h3>
+
+            <div class="form-group">
+                <label>اسم الشيء المطلوبة</label>
+                <input type="text" id="wish-title" class="input-field" placeholder="مثال: سماعة جديدة، كوتشي...">
+            </div>
+
+            <div class="form-group">
+                <label>السعر المتوقع (ج.م)</label>
+                <input type="number" id="wish-price" class="input-field" placeholder="0">
+            </div>
+
+            <button class="btn" onclick="submitWishlistItem()">إضافة للنوتة 📌</button>
+            <button class="btn btn-secondary" onclick="closeModal('wishlist-modal')">إلغاء</button>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let currentUser = null;
+        let generatedOTP = null;
+        let usersData = JSON.parse(localStorage.getItem('wallet_app_users')) || {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('wallet_app_logged_in');
+            if (savedUser && usersData[savedUser]) {
+                currentUser = savedUser;
+                showDashboard();
+            }
+        });
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            document.body.setAttribute('data-theme', currentTheme === 'light' ? 'dark' : 'light');
+        }
+
+        // Auth Logic
+        function handlePhoneSubmit() {
+            const phone = document.getElementById('phone-input').value.trim();
+            if (!phone || phone.length < 10) return alert('برجاء إدخال رقم موبايل صحيح!');
+
+            currentUser = phone;
+            document.getElementById('auth-step-phone').classList.add('hidden');
+
+            if (usersData[phone]) {
+                document.getElementById('auth-step-login').classList.remove('hidden');
+            } else {
+                generatedOTP = Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('otp-display').value = generatedOTP;
+                document.getElementById('auth-step-register').classList.remove('hidden');
+            }
+        }
+
+        function handleLogin() {
+            const pass = document.getElementById('login-pass').value;
+            if (usersData[currentUser].pass === pass) {
+                localStorage.setItem('wallet_app_logged_in', currentUser);
+                showDashboard();
+            } else {
+                alert('كلمة السر غير صحيحة!');
+            }
+        }
+
+        function handleRegister() {
+            const otp = document.getElementById('otp-input').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            if (otp != generatedOTP) return alert('رمز OTP غير صحيح!');
+            if (!pass || pass.length < 4) return alert('برجاء اختيار كلمة سر قوية!');
+
+            usersData[currentUser] = { pass: pass, cash: 0, bank: 0, txns: [], wishlist: [] };
+            saveData();
+            localStorage.setItem('wallet_app_logged_in', currentUser);
+            showDashboard();
+        }
+
+        function logout() {
+            localStorage.removeItem('wallet_app_logged_in');
+            location.reload();
+        }
+
+        // Navigation Tabs
+        function switchTab(tab) {
+            document.getElementById('tab-home').classList.toggle('active', tab === 'home');
+            document.getElementById('tab-wishlist').classList.toggle('active', tab === 'wishlist');
+
+            document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
+            document.getElementById('view-wishlist').classList.toggle('hidden', tab !== 'wishlist');
+        }
+
+        // Dashboard Logic
+        function showDashboard() {
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('user-phone-display').innerText = `أهلاً بك (${currentUser}) 👋`;
+
+            // Ensure wishlist array exists for old users
+            if (!usersData[currentUser].wishlist) {
+                usersData[currentUser].wishlist = [];
+            }
+
+            updateBalances();
+            renderTransactions();
+            renderWishlist();
+        }
+
+        function updateBalances() {
+            const userData = usersData[currentUser];
+            document.getElementById('cash-balance').innerText = `${userData.cash.toLocaleString()} ج.م`;
+            document.getElementById('bank-balance').innerText = `${userData.bank.toLocaleString()} ج.م`;
+        }
+
+        // Modal Controls
+        function openModal(type, defaultSource = 'cash') {
+            document.getElementById('action-modal').style.display = 'flex';
+            document.getElementById('txn-type').value = type;
+            document.getElementById('txn-source').value = defaultSource;
+            adjustModalFields();
+        }
+
+        function openWishlistModal() {
+            document.getElementById('wishlist-modal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function adjustModalFields() {
+            const type = document.getElementById('txn-type').value;
+            const groupDest = document.getElementById('group-destination');
+            const targetLabel = document.getElementById('target-label');
+
+            if (type === 'transfer') {
+                groupDest.classList.remove('hidden');
+                targetLabel.innerText = 'من خزنة';
+            } else {
+                groupDest.classList.add('hidden');
+                targetLabel.innerText = type === 'deposit' ? 'إيداع إلى' : 'خصم من';
+            }
+        }
+
+        // Transaction Operations
+        function submitTransaction() {
+            const type = document.getElementById('txn-type').value;
+            const amount = parseFloat(document.getElementById('txn-amount').value);
+            const source = document.getElementById('txn-source').value;
+            const dest = document.getElementById('txn-dest').value;
+            const note = document.getElementById('txn-note').value.trim() || (type === 'expense' ? 'مصروف' : 'معاملة');
+
+            if (!amount || amount <= 0) return alert('برجاء إدخال مبلغ صحيح!');
+
+            const user = usersData[currentUser];
+
+            if (type === 'expense') {
+                if (user[source] < amount) return alert('الرصيد في هذه الخزنة غير كافٍ!');
+                user[source] -= amount;
+            } else if (type === 'deposit') {
+                user[source] += amount;
+            } else if (type === 'transfer') {
+                if (source === dest) return alert('لا يمكن التحويل لنفس الخزنة!');
+                if (user[source] < amount) return alert('الرصيد غير كافٍ للتحويل!');
+                user[source] -= amount;
+                user[dest] += amount;
+            }
+
+            user.txns.unshift({ id: Date.now(), type, amount, source, dest, note, date: new Date().toISOString() });
+
+            saveData();
+            updateBalances();
+            renderTransactions();
+            closeModal('action-modal');
+        }
+
+        function renderTransactions() {
+            const user = usersData[currentUser];
+            const listContainer = document.getElementById('txn-list');
+            const fromDate = document.getElementById('filter-from').value;
+            const toDate = document.getElementById('filter-to').value;
+
+            listContainer.innerHTML = '';
+            let filteredExpenses = 0;
+
+            const filteredTxns = user.txns.filter(t => {
+                const tDate = t.date.split('T')[0];
+                if (fromDate && tDate < fromDate) return false;
+                if (toDate && tDate > toDate) return false;
+                return true;
+            });
+
+            if (filteredTxns.length === 0) {
+                listContainer.innerHTML = `<p style="text-align: center; color: var(--text-sub); padding: 20px;">لا توجد معاملات مسجلة</p>`;
+            }
+
+            filteredTxns.forEach(t => {
+                const li = document.createElement('li');
+                li.className = 'txn-item';
+
+                let typeClass = 'txn-expense', sign = '-', walletText = t.source === 'cash' ? 'المحفظة' : 'الكارت';
+
+                if (t.type === 'deposit') {
+                    typeClass = 'txn-income'; sign = '+';
+                } else if (t.type === 'transfer') {
+                    typeClass = 'txn-transfer'; sign = '🔄';
+                    walletText = `${t.source === 'cash' ? 'المحفظة' : 'الكارت'} ⬅️ ${t.dest === 'cash' ? 'المحفظة' : 'الكارت'}`;
+                } else {
+                    filteredExpenses += t.amount;
+                }
+
+                const formattedDate = new Date(t.date).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                li.innerHTML = `
+                    <div class="txn-info">
+                        <h4>${t.note}</h4>
+                        <p>${formattedDate} • (${walletText})</p>
+                    </div>
+                    <div class="txn-amount ${typeClass}">${sign} ${t.amount.toLocaleString()} ج.م</div>
+                `;
+                listContainer.appendChild(li);
+            });
+
+            document.getElementById('total-filtered-expenses').innerText = `${filteredExpenses.toLocaleString()} ج.م`;
+        }
+
+        // Wishlist Operations
+        function submitWishlistItem() {
+            const title = document.getElementById('wish-title').value.trim();
+            const price = parseFloat(document.getElementById('wish-price').value);
+
+            if (!title) return alert('أدخل اسم الشيء المطلوبة!');
+            if (!price || price <= 0) return alert('أدخل سعراً صحيحاً!');
+
+            usersData[currentUser].wishlist.unshift({
+                id: Date.now(),
+                title,
+                price
+            });
+
+            saveData();
+            renderWishlist();
+            closeModal('wishlist-modal');
+            document.getElementById('wish-title').value = '';
+            document.getElementById('wish-price').value = '';
+        }
+
+        function renderWishlist() {
+            const user = usersData[currentUser];
+            const listContainer = document.getElementById('wish-list');
+            listContainer.innerHTML = '';
+            let total = 0;
+
+            if (user.wishlist.length === 0) {
+                listContainer.innerHTML = `<p style="text-align: center; color: var(--text-sub); padding: 20px;">القائمة فارغة، أضف حجات حابب تشتريها ✨</p>`;
+            }
+
+            user.wishlist.forEach(item => {
+                total += item.price;
+                const li = document.createElement('li');
+                li.className = 'wish-item';
+                li.id = `wish-${item.id}`;
+
+                li.innerHTML = `
+                    <div class="wish-info">
+                        <h4>${item.title}</h4>
+                        <p>${item.price.toLocaleString()} ج.م</p>
+                    </div>
+                    <div class="wish-actions">
+                        <button class="action-icon-btn btn-check" onclick="markWishBought(${item.id})">✔ تم الشراء</button>
+                        <button class="action-icon-btn btn-delete" onclick="deleteWishItem(${item.id})">🗑️</button>
+                    </div>
+                `;
+                listContainer.appendChild(li);
+            });
+
+            document.getElementById('wishlist-total').innerText = `${total.toLocaleString()} ج.م`;
+        }
+
+        function markWishBought(id) {
+            const el = document.getElementById(`wish-${id}`);
+            if (el) {
+                el.classList.add('bought');
+                setTimeout(() => {
+                    deleteWishItem(id);
+                }, 1000);
+            }
+        }
+
+        function deleteWishItem(id) {
+            usersData[currentUser].wishlist = usersData[currentUser].wishlist.filter(item => item.id !== id);
+            saveData();
+            renderWishlist();
+        }
+
+        function saveData() {
+            localStorage.setItem('wallet_app_users', JSON.stringify(usersData));
+        }
+    </script>
+</body>
+
+</html>
